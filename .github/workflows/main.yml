@@ -35,13 +35,22 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Build APK
-        run: gradle assembleDebug
-        working-directory: android-project
+      - name: Find and build Android project
+        run: |
+          SETTINGS_FILE=$(find android-project -type f \( -name settings.gradle -o -name settings.gradle.kts \) | head -n 1)
+          if [ -z "$SETTINGS_FILE" ]; then
+            echo "ERROR: No settings.gradle found in ZIP"
+            find android-project -maxdepth 4 -type f
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$SETTINGS_FILE")
+          cd "$PROJECT_DIR"
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Gaming-Sidebar-debug-apk
-          path: android-project/app/build/outputs/apk/debug/app-debug.apk
+          path: android-project/**/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
           
