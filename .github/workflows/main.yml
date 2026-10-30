@@ -1,49 +1,27 @@
 
-name: Build Gaming Sidebar APK
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+android {
+    namespace 'com.example.gamingsidebar'
+    compileSdk 35
 
-jobs:
-  build:
-    runs-on: ubuntu-24.04
+    defaultConfig {
+        applicationId 'com.example.gamingsidebar'
+        minSdk 23
+        targetSdk 28
+        versionCode 2
+        versionName '1.1'
+    }
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 
-      - name: Set up Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Accept Android licenses
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
-
-      - name: Install Android SDK
-        run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Extract Android project
-        run: |
-          unzip -o "RealmeC53_GamingSidebar_AndroidStudio_Project-1.zip" -d android-project
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-
-      - name: Build APK
-        run: gradle assembleDebug
-        working-directory: android-project
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Gaming-Sidebar-debug-apk
-          path: android-project/app/build/outputs/apk/debug/app-debug.apk
-          
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
